@@ -1,0 +1,978 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Posts & Users API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retrieve all posts for a specific user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "ID of the user whose posts to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "A list of posts" }
+        }
+      },
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Create a new post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "string" },
+                  "content": { "type": "string" }
+                },
+                "required": ["userId", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Post created successfully" }
+        }
+      }
+    },
+    "/api/posts/{postId}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retrieve a specific post by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "ID of the post to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post retrieved successfully" }
+        }
+      },
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Update a specific post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "ID of the post to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": { "type": "string" }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Post updated successfully" }
+        }
+      },
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Delete a specific post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "ID of the post to delete"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Post deleted successfully" }
+        }
+      }
+    },
+    "/api/users/signup": {
+      "post": {
+        "tags": ["UserAuth"],
+        "summary": "Register a new user",
+        "security":[],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["name", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "password": "hashedPasswordString"
+                }
+              }
+            }
+          },
+          "400": { "description": "Password should be 8–12 characters long and include at least one special character" }
+        }
+      }
+    },
+    "/api/users/signin": {
+      "post": {
+        "tags": ["UserAuth"],
+        "summary": "Login a user",
+        "security":[],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "400": { "description": "Incorrect credentials" }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "tags": ["UserAuth"],
+        "summary": "Logout from current device",
+        "security": [{ "jwtAuth": [] }],
+        "responses": {
+          "200": { "description": "Logged out from current device" },
+          "500": { "description": "Logout failed" }
+        }
+      }
+    },
+    "/api/users/logout-all-devices": {
+      "post": {
+        "tags": ["UserAuth"],
+        "summary": "Logout from all devices",
+        "security": [{ "jwtAuth": [] }],
+        "responses": {
+          "200": { "description": "Logged out from all devices" },
+          "500": { "description": "Logout from all devices failed" }
+        }
+      }
+    },
+    "/api/users/get-details/{userId}": {
+      "get": {
+        "tags": ["UserProfile"],
+        "summary": "Get details of a specific user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "Id of the user to get details"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Details retrieved" }
+        }
+      }
+    },
+    "/api/users/get-all-details":{
+      "get":{
+        "tags":["UserProfile"],
+        "summary":"get details of all users",
+        "responses":{
+          "200":"List of all users details",
+          "content":{
+            "application/json":{
+"example": [
+              {
+                "_id": "abc123xyz789",
+                "name": "Alice Johnson",
+                "email": "alice.johnson@example.com",
+                "gender": "female",
+                "avatar": "https://example.com/images/alice.png",
+                "tokens": [
+                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakeToken123"
+                ],
+                "createdAt": "2026-01-15T10:20:30.000Z",
+                "updatedAt": "2026-02-10T14:45:00.000Z",
+                "__v": 1
+              },
+              {
+                "_id": "def456uvw321",
+                "name": "Bob Smith",
+                "email": "bob.smith@example.com",
+                "gender": "male",
+                "avatar": "https://example.com/images/bob.jpg",
+                "tokens": [],
+                "createdAt": "2026-01-20T08:15:00.000Z",
+                "updatedAt": "2026-02-12T09:30:00.000Z",
+                "__v": 0
+              },
+              {
+                "_id": "ghi789rst654",
+                "name": "Charlie Davis",
+                "email": "charlie.davis@example.com",
+                "gender": "non-binary",
+                "avatar": "",
+                "tokens": [
+                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakeToken456"
+                ],
+                "createdAt": "2026-02-01T12:00:00.000Z",
+                "updatedAt": "2026-02-20T16:00:00.000Z",
+                "__v": 2
+              }
+            ]
+
+            }
+          }
+        }
+      }
+    },
+    "/api/users/update-details/:userId":{
+      "post":{
+        "tags":["UserProfile"],
+        "summary":"Update user profile details",
+        "parameters":[
+          {
+            "in":"path",
+            "name":"userId",
+            "schema":{"type":"string"},
+            "required":true,
+            "description":"Id of the user to update"
+
+          }
+        ],
+        "requestBody":{
+          "required":true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "type":"object",
+                "properties":{
+                  "name": { "type": "string" },
+              "email": { "type": "string" },
+              "gender": { "type": "string" },
+              "avatar": { "type": "string", "description": "URL or file path to avatar image" }
+                }
+            },
+          "example": {
+            "name": "Alice Johnson",
+            "email": "alice.johnson@example.com",
+            "gender": "female",
+            "avatar": "https://example.com/images/alice.png"
+          }
+          },
+          "multipart/form-data":{
+            "schema":{
+              "type":"object",
+              "properties":{
+                "avatar":{
+                  "type": "string",
+                "format": "binary",
+                "description": "Upload avatar image file"
+                }
+              }
+            }
+          }
+          }
+        },"responses":{
+           "200": {
+        "description": "User details updated successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "message": "User details updated successfully",
+              "data": {
+                "name": "Alice Johnson",
+                "email": "alice.johnson@example.com",
+                "gender": "female",
+                "avatar": "https://example.com/images/alice.png"
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Password updates are not allowed"
+      },
+      "404": {
+        "description": "User not found"
+      },
+      "500": {
+        "description": "Something went wrong"
+      }
+        }
+
+      }
+    },
+    "/api/comments/:postId":{
+      "get":{
+        "tags":["Comments"],
+        "summary":"Get comments for a specific post",
+        "parameters":[{
+          "in":"path",
+          "name":"postId",
+          "schema":{"type":"string"},
+          "required":true
+        }],
+        "responses":{
+          "200":{
+            "description":"Comments retrived successfully",
+             "content":{
+              "application/json":{
+                "example":{
+                  
+              "_id": "post123abc456",
+              "comments": [
+                {
+                  "user": "user789xyz123",
+                  "text": "This place was amazing!",
+                  "_id": "comment001",
+                  "createdAt": "2026-02-20T10:15:30.000Z"
+                },
+                {
+                  "user": "user456uvw789",
+                  "text": "Not my favorite experience.",
+                  "_id": "comment002",
+                  "createdAt": "2026-02-21T14:45:00.000Z"
+                },
+                {
+                  "user": "user321rst654",
+                  "text": "Would definitely visit again!",
+                  "_id": "comment003",
+                  "createdAt": "2026-02-22T09:30:00.000Z"
+                }
+              ]
+                }
+              }
+             }
+          },
+          "404":{"description":"post not found"}
+                }
+      },
+      "post":{
+        "tags":["Comments"],
+        "summary":"Create comments on a post ",
+        "parameters":[{
+          "in":"path",
+          "name":"postId",
+          "schema":{"type":"string"},
+          "required":true
+        }],
+        "requestBody":{
+          "required":true,
+        "content":{
+          "application/json":{
+            "schema":{
+              "type":"object",
+              "properties":{
+                "userId":{"type":"string","description": "ID of the user adding the comment"},
+                "text":{"type":"string","description":"comment text"}
+
+              },"required":["userId","text"]
+            }
+          }
+        },"example":{
+          "commentData": {
+              "user": "user123abc456",
+              "text": "This is a great post!"
+            }
+        }
+        }
+      },
+      "responses":{
+      "200":{
+        "description": "Comment added successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "_id": "comment789xyz123",
+              "user": "user123abc456",
+              "text": "This is a great post!",
+              "createdAt": "2026-02-28T12:30:00.000Z"
+
+      }
+    }
+  }
+},
+"400":{
+  "description":"post not found"
+},
+"500":{"description":"Something went wrong"}
+    }
+    },
+    "/api/comments/:commentId":{
+      "put":{
+        "tags":["Comments"],
+        "summary":"Update a specific comment",
+        "parameters":[{
+          "in":"path",
+          "name":"commentId",
+          "schema":{"type":"string"},
+          "required":true,
+          "description":"Id to update a comment"
+        }],
+        "requestBody":{
+          "required":true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "type": "object",
+            "properties": {
+              "commentData": {
+                "type": "object",
+                "properties": {
+                  "user": { "type": "string", "description": "ID of the user adding the comment" },
+                  "text": { "type": "string", "description": "Comment text" }
+                },
+                "required": ["user", "text"]
+
+              }
+            }
+          },"example": {
+            "commentData": {
+              "user": "user123abc456",
+              "text": "This is a great post!"
+            }
+          }
+        }
+      }
+    },"responses": {
+      "200": {
+        "description": "Comment added successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "_id": "comment789xyz123",
+              "user": "user123abc456",
+              "text": "This is a great post!",
+              "createdAt": "2026-02-28T12:30:00.000Z"
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Post not found"
+      },
+      "500": {
+        "description": "Something went wrong"
+      }
+    }
+    },"delete":{
+      "tags":["Comments"],
+      "summary":"Delete a specific comment",
+      "parameters":[{
+        "in":"path",
+        "name":"commentId",
+        "schema":{"type":"string"},
+        "required":true,
+        "description":"Id to delete comment"
+      }
+      ],
+      "requestBody":{
+        "requried":true,
+        "content":{
+          "application/json":{
+            "schema":{
+              "type":"object",
+            "properties":{
+              "postId":{
+                "type":"string",
+                "description":"Id of the post that comment belongs to"
+              }
+            },
+            "required":["postId"]
+            },
+            "example":{
+              "postId": "post123abc456"
+            }
+          }
+        }
+      },
+      "responses": {
+      "200": {
+        "description": "Comment deleted successfully",
+        "content": {
+          "application/json": {
+            "example": "Comment deleted Successfully"
+          }
+        }
+      },
+      "400": {
+        "description": "Comment not found"
+      },
+      "500": {
+        "description": "Something went wrong"
+      }
+    }
+      }
+    },
+    "/api/likes/{id}":{
+"get":{
+  "tags":["Likes"],
+  "summary":"get Likes on a post",
+  "parameters":[{
+    "in":"path",
+    "name":"id",
+    "schema":{"type":"string"},
+    "required":true,
+    "description":"Id to get like of a comment"
+  }],"responses":{
+    "200":{
+      "description":"Likes retrived successfully",
+  "content":{
+    "application/json":{
+ "example": {
+              "postId": "post123abc456",
+              "likeCount": 2,
+              "likes": [
+                {
+                  "_id": "user789xyz123",
+                  "name": "Alice Johnson",
+                  "email": "alice.johnson@example.com"
+                },
+                {
+                  "_id": "user456uvw789",
+                  "name": "Bob Smith",
+                  "email": "bob.smith@example.com"
+                }
+              ]
+            }
+
+    }
+  }
+},"404":{
+  "description": "Post not found"
+
+}
+  }
+
+}
+    },
+    "/api/likes/toggle/{postId}":{
+ "post": {
+    "tags": ["Likes"],
+    "summary": "Toggle like on a post",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "postId",
+        "schema": { "type": "string" },
+        "required": true,
+        "description": "ID of the post to toggle like"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string",
+                "description": "ID of the user toggling the like"
+              }
+            },
+            "required": ["userId"]
+          },
+          "example": {
+            "userId": "user123abc456"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Like toggled successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "message": "like toggled",
+              "likeCount": 2,
+              "likes": [
+                {
+                  "_id": "user123abc456",
+                  "name": "Alice Johnson",
+                  "email": "alice.johnson@example.com"
+                },
+                {
+                  "_id": "user456uvw789",
+                  "name": "Bob Smith",
+                  "email": "bob.smith@example.com"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Something went wrong"
+      }
+    }
+  }
+    },
+    "/api/friends/get-friends/{userId}": {
+  "get": {
+    "tags": ["Friends"],
+    "summary": "Get all friends of a specific user",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "userId",
+        "schema": { "type": "string" },
+        "required": true,
+        "description": "ID of the user to retrieve friends for"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of friends retrieved successfully",
+        "content": {
+          "application/json": {
+            "example": [
+              {
+                "_id": "user123abc456",
+                "name": "Alice Johnson",
+                "email": "alice.johnson@example.com"
+              },
+              {
+                "_id": "user456uvw789",
+                "name": "Bob Smith",
+                "email": "bob.smith@example.com"
+              }
+            ]
+          }
+        }
+      },
+      "500": { "description": "Something went wrong" }
+    },
+    "security": [{ "jwtAuth": [] }]
+  }
+},
+
+"/api/friends/get-pending-requests": {
+  "get": {
+    "tags": ["Friends"],
+    "summary": "Get all pending friend requests for a user",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string", "description": "ID of the user" }
+            },
+            "required": ["userId"]
+          },
+          "example": { "userId": "user123abc456" }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Pending requests retrieved successfully",
+        "content": {
+          "application/json": {
+            "example": [
+              {
+                "_id": "user789xyz123",
+                "name": "Charlie Davis",
+                "email": "charlie.davis@example.com"
+              }
+            ]
+          }
+        }
+      },
+      "500": { "description": "Something went wrong" }
+    },
+    "security": [{ "jwtAuth": [] }]
+  }
+},
+
+"/api/friends/toggle-friendship/{friendId}": {
+  "post": {
+    "tags": ["Friends"],
+    "summary": "Toggle friendship request (add or remove)",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "friendId",
+        "schema": { "type": "string" },
+        "required": true,
+        "description": "ID of the friend to toggle friendship with"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string", "description": "ID of the user" }
+            },
+            "required": ["userId"]
+          },
+          "example": { "userId": "user123abc456" }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Friendship toggled successfully",
+        "content": {
+          "application/json": {
+            "examples": {
+              "added": {
+                "value": {
+                  "message": "Friendship request added",
+                  "friendId": "friend789xyz123"
+                }
+              },
+              "removed": {
+                "value": {
+                  "message": "Friendship request removed",
+                  "friendId": "friend789xyz123"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": { "description": "Something went wrong" }
+    },
+    "security": [{ "jwtAuth": [] }]
+  }
+},
+
+"/api/friends/response-to-request/{friendId}": {
+  "post": {
+    "tags": ["Friends"],
+    "summary": "Respond to a pending friend request",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "friendId",
+        "schema": { "type": "string" },
+        "required": true,
+        "description": "ID of the friend request to respond to"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string", "description": "ID of the user" },
+              "action": {
+                "type": "string",
+                "enum": ["accepted", "rejected"],
+                "description": "Action to take on the request"
+              }
+            },
+            "required": ["userId", "action"]
+          },
+          "example": {
+            "userId": "user123abc456",
+            "action": "accepted"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Friend request responded successfully",
+        "content": {
+          "application/json": {
+            "examples": {
+              "accepted": {
+                "value": {
+                  "message": "Friend request accepted",
+                  "friendId": "friend789xyz123"
+                }
+              },
+              "rejected": {
+                "value": {
+                  "message": "Friend request rejected",
+                  "friendId": "friend789xyz123"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": { "description": "No pending request found" },
+      "500": { "description": "Something went wrong" }
+    }
+  }
+},"/api/otp/send":{
+  "post":{
+    "tags":["OTP"],
+    "summary":"Send an OTP for password reset",
+    "requestBody":{
+      "required":true,
+      "content":{
+        "application/json":{
+          "schema":{
+            "type":"object",
+            "properties":{
+              "email":{
+                "type":"string",
+                "description":"email to send otp"
+              }
+            },"required":true
+          }
+        }
+      }
+    },
+    "responses":{
+      "200":{
+        "description":"Otp has been sent"
+      },
+      "404":{
+        "description":"Error sending otp"
+      }
+  }
+}
+},
+"/api/otp/verfiy":{
+  "post":{
+    "tags":["OTP"],
+    "summary":"Verify Otp",
+    "requestBody":{
+      "required":true,
+      "content":{
+        "application/json":{
+          "schema":{
+            "type":"object",
+            "properties":{
+              "userId":{"type":"string","description":"ID of the user"},
+              "otp":{"type":"string","description":"OTP which need to be verifyed"}
+          
+            },
+            "required":["userId","otp"]
+          },
+          "example": {
+            "userId": "user123abc456",
+            "otp": "67890"
+          }
+        }
+      }
+    },
+    "responses":{
+      "200":{
+        "description":"Otp verified successfully"
+      },
+      "404":{
+        "description":"Error verfiying otp"
+      }
+    }
+  }
+},
+"/api/otp/reset-password":{
+  "post":{
+    "tags":["OTP"],
+    "summary":"Reset the user's password",
+    "requestBody":{
+      "required":true,
+      "content":{
+        "application/json":{
+          "schema":{
+            "type":"object",
+            "properties":{
+              "userId":{"type":"string","description": "ID of the user"},
+              "newPassword":{"type":"string","description":"new Updated password "}
+            },
+            "required":["userId","newPassword"]
+          },
+            "example": {
+            "userId": "user123abc456",
+            "action": "accepted"
+          }
+        }
+      }
+    },"responses":{
+      "200":{
+        "description":"Password reset successful"
+      },
+      "404":{
+        "description":"Error updating password"
+      }
+    }
+  }
+}
+  },
+  "tags": [
+    { "name": "Posts", "description": "Operations related to posts" },
+    { "name": "UserAuth", "description": "User authentication and account management" },
+    { "name": "UserProfile", "description": "Operations related to user profile" },
+    {"name":"Comments","description":"Opeartions related to comments"},
+    {"name":"Likes", "description":"Opeartions related to Likes"},
+    {"name":"Friends","description":"Opeartions related to friends"},
+    {"name":"OTP","description":"Opeartions related to OTP"}
+  ],
+  "components": {
+    "securitySchemes": {
+      "jwtAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'"
+      }
+    }
+  },
+  "security": [
+    { "jwtAuth": [] }
+  ]
+}
